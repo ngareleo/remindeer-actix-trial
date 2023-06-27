@@ -1,10 +1,12 @@
 use std::error::Error;
-use crate::{ server::models::user_model::User, helpers::types::{ DbConnection, DbPool } };
+use crate::{
+    server::models::user_model::User,
+    server::repository::repository::RepositoryConfig,
+    helpers::types::{ DbConnection, DbPool },
+    schema::users,
+};
 use diesel::{ prelude::*, insert_into };
 use serde::Deserialize;
-use crate::schema::users;
-
-use super::repository::RepositoryConfig;
 
 #[derive(Deserialize, Insertable)]
 #[diesel(table_name = users)]
@@ -19,13 +21,13 @@ pub struct UserRespository {
     pub pool: DbPool,
 }
 
-impl RepositoryConfig<UserRespository> for UserRespository {
+impl RepositoryConfig for UserRespository {
     fn get_connection(&self) -> Result<DbConnection, Box<dyn Error>> {
         Ok(self.pool.get()?)
     }
 
     fn get_pool(&self) -> DbPool {
-        self.pool
+        self.pool.clone()
     }
 }
 
