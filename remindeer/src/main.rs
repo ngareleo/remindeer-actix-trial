@@ -9,7 +9,7 @@ use diesel::PgConnection;
 use diesel::r2d2::{ self, ConnectionManager };
 use dotenvy::dotenv;
 use helpers::types::DbPool;
-use server::config::{ run_server, AppConfig };
+use server::config::{ run, AppConfig };
 use server::repository::user_repository::UserRespository;
 
 #[actix_web::main]
@@ -38,8 +38,8 @@ async fn main() {
         8080
     );
 
-    match run_server(app_config.clone()).await {
-        Ok(_) => println!("Server running on http://localhost:{}", app_config.port),
+    match run(app_config.clone()).await {
+        Ok(_) => println!("Server running on http://localhost:{} closed", app_config.port),
         Err(error) => {
             dbg!("{}", error);
             process::exit(1)

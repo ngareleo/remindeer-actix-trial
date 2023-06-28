@@ -1,14 +1,14 @@
-use std::{ error::Error, sync::{ Arc, Mutex } };
+use std::{ error::Error, sync::Arc };
 use actix_web::{ get, web, Responder, HttpResponse };
-use crate::server::repository::user_repository::UserRespository;
+use crate::helpers::types::AppUserRepository;
 
 #[get("/users")]
 pub async fn get_users(
-    repo: web::Data<Arc<Mutex<UserRespository>>>
+    app_user_repository: AppUserRepository
 ) -> Result<impl Responder, Box<dyn Error>> {
     let users = web::block(move || {
-        let repo = Arc::clone(&repo);
-        let mut repository = repo.lock().unwrap();
+        let repository = Arc::clone(&app_user_repository);
+        let mut repository = repository.lock().unwrap();
         let users = repository.get_all_users().unwrap_or_else(|error| {
             dbg!("{}", error);
             vec![]

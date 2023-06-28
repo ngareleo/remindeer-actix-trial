@@ -8,7 +8,7 @@ use crate::{
 use diesel::{ prelude::*, insert_into };
 use serde::Deserialize;
 
-#[derive(Deserialize, Insertable)]
+#[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = users)]
 pub struct NewUser<'a> {
     pub name: &'a str,
