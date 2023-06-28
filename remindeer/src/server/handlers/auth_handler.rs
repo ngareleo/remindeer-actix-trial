@@ -1,7 +1,10 @@
 use std::sync::Arc;
 use actix_web::{ Responder, web, post, HttpResponse };
 use serde::Deserialize;
-use crate::{ helpers::types::AppUserRepository, server::models::user_model::User };
+use crate::{
+    helpers::types::AppUserRepository,
+    server::{ models::user_model::User, repository::repository_errors::RepositoryError },
+};
 
 #[derive(Deserialize)]
 pub struct LoginFormData {
@@ -29,7 +32,7 @@ pub async fn sign_in(
             Ok(
                 repository
                     .user_exists(&form.username, &form.password)
-                    .map_err(|_| "Problem finding user")?
+                    .map_err(move |error| { error.get_error_message() })?
             )
         }
     ).await?;

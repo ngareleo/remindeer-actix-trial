@@ -9,5 +9,4 @@ use crate::server::repository::user_repository::UserRespository;
 pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 pub type DbConnection = PooledConnection<ConnectionManager<PgConnection>>;
 
-pub type AppDbPool = web::Data<DbPool>;
 pub type AppUserRepository = web::Data<Arc<Mutex<UserRespository>>>;

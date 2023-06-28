@@ -7,6 +7,7 @@ use crate::{
 };
 use diesel::{ prelude::*, insert_into };
 use serde::Deserialize;
+use super::repository_errors::UserRepositoryErrors;
 
 #[derive(Deserialize, Insertable, Debug)]
 #[diesel(table_name = users)]
@@ -49,12 +50,21 @@ impl UserRespository {
         Ok(user)
     }
 
-    pub fn user_exists(&mut self, uname: &str, pass: &str) -> Result<Option<User>, Box<dyn Error>> {
-        let mut conn = self.get_connection()?;
-        let user = users::table
+    pub fn user_exists(
+        &mut self,
+        uname: &str,
+        pass: &str
+    ) -> Result<Option<User>, UserRepositoryErrors> {
+        let mut conn = self.get_connection().map_err(|_| UserRepositoryErrors::ConnectionError())?;
+        let user: User = users::table
             .filter(users::username.eq(uname))
             .select(User::as_select())
-            .get_result(&mut conn)?;
+            .get_result(&mut conn)
+            .map_err(|_| UserRepositoryErrors::UserNotFound())?;
+
+        if user.password != pass {
+            return Err(UserRepositoryErrors::IncorrectPassword());
+        }
 
         Ok(Some(user))
     }

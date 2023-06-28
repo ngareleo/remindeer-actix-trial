@@ -53,6 +53,7 @@ pub async fn run(app_config: AppConfig) -> Result<(), Error> {
                 .service(index_handler::index)
                 .service(users_handler::get_users)
                 .service(auth_handler::sign_up)
+                .service(auth_handler::sign_in)
                 .default_service(
                     web::route().guard(guard::Not(guard::Get())).to(error_handling::handle404)
                 )
