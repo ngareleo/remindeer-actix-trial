@@ -1,4 +1,3 @@
-use std::error::Error;
 use crate::{
     server::models::user_model::User,
     server::repository::repository::RepositoryConfig,
@@ -22,9 +21,9 @@ pub struct UserRespository {
     pub pool: DbPool,
 }
 
-impl RepositoryConfig for UserRespository {
-    fn get_connection(&self) -> Result<DbConnection, Box<dyn Error>> {
-        Ok(self.pool.get()?)
+impl RepositoryConfig<UserRepositoryErrors> for UserRespository {
+    fn get_connection(&self) -> Result<DbConnection, UserRepositoryErrors> {
+        Ok(self.pool.get().map_err(|_| UserRepositoryErrors::ConnectionError)?)
     }
 
     fn get_pool(&self) -> DbPool {
@@ -43,10 +42,13 @@ impl UserRespository {
         email: &str,
         password: &str,
         username: &str
-    ) -> Result<User, Box<dyn Error>> {
+    ) -> Result<User, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
         let new_user = NewUser { name, email, password, username };
-        let user = insert_into(users::table).values(&new_user).get_result(&mut conn)?;
+        let user = insert_into(users::table)
+            .values(&new_user)
+            .get_result(&mut conn)
+            .map_err(|_| UserRepositoryErrors::UserInsertionError)?;
         Ok(user)
     }
 
@@ -55,27 +57,27 @@ impl UserRespository {
         uname: &str,
         pass: &str
     ) -> Result<Option<User>, UserRepositoryErrors> {
-        let mut conn = self.get_connection().map_err(|_| UserRepositoryErrors::ConnectionError())?;
+        let mut conn = self.get_connection()?;
         let user: User = users::table
             .filter(users::username.eq(uname))
             .select(User::as_select())
             .get_result(&mut conn)
-            .map_err(|_| UserRepositoryErrors::UserNotFound())?;
+            .map_err(|_| UserRepositoryErrors::UserNotFound)?;
 
         if user.password != pass {
-            return Err(UserRepositoryErrors::IncorrectPassword());
+            return Err(UserRepositoryErrors::IncorrectPassword);
         }
 
         Ok(Some(user))
     }
 
-    pub fn get_all_users(&mut self) -> Result<Vec<User>, Box<dyn Error>> {
+    pub fn get_all_users(&mut self) -> Result<Vec<User>, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
         let results = users::table
             .limit(10)
             .select(User::as_select())
             .load(&mut conn)
-            .expect("Error loading users");
+            .map_err(|_| UserRepositoryErrors::UsersFetchingError)?;
         Ok(results)
     }
 }

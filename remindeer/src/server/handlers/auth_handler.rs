@@ -3,7 +3,7 @@ use actix_web::{ Responder, web, post, HttpResponse };
 use serde::Deserialize;
 use crate::{
     helpers::types::AppUserRepository,
-    server::{ models::user_model::User, repository::repository_errors::RepositoryError },
+    server::{ models::user_model::User, repository::repository_errors::UserRepositoryErrors },
 };
 
 #[derive(Deserialize)]
@@ -26,14 +26,16 @@ pub async fn sign_in(
     form: web::Form<LoginFormData>
 ) -> Result<impl Responder, actix_web::Error> {
     let result = web::block(
-        move || -> Result<Option<User>, &'static str> {
+        move || -> Result<Option<User>, UserRepositoryErrors> {
             let repository = Arc::clone(&app_user_repository);
-            let mut repository = repository.lock().map_err(|_| "Error acquiring lock")?;
-            Ok(
-                repository
-                    .user_exists(&form.username, &form.password)
-                    .map_err(move |error| { error.get_error_message() })?
-            )
+            let mut repository = repository
+                .lock()
+                .map_err(|_|
+                    UserRepositoryErrors::create_external_error(
+                        String::from("Error acquiring lock")
+                    )
+                )?;
+            Ok(repository.user_exists(&form.username, &form.password)?)
         }
     ).await?;
 
@@ -52,14 +54,16 @@ pub async fn sign_up(
     form: web::Form<SignUpFormData>
 ) -> Result<impl Responder, actix_web::Error> {
     let result = web::block(
-        move || -> Result<User, &'static str> {
+        move || -> Result<User, UserRepositoryErrors> {
             let repository = Arc::clone(&app_user_repository);
-            let mut repository = repository.lock().map_err(|_| "Error acquiring lock")?;
-            Ok(
-                repository
-                    .create_user(&form.name, &form.email, &form.password, &form.username)
-                    .map_err(|_| "Problem creating user")?
-            )
+            let mut repository = repository
+                .lock()
+                .map_err(|_|
+                    UserRepositoryErrors::create_external_error(
+                        String::from("Error acquiring lock")
+                    )
+                )?;
+            Ok(repository.create_user(&form.name, &form.email, &form.password, &form.username)?)
         }
     ).await?;
 
