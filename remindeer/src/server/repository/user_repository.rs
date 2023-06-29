@@ -52,11 +52,7 @@ impl UserRespository {
         Ok(user)
     }
 
-    pub fn user_exists(
-        &mut self,
-        uname: &str,
-        pass: &str
-    ) -> Result<Option<User>, UserRepositoryErrors> {
+    pub fn user_exists(&mut self, uname: &str, pass: &str) -> Result<User, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
         let user: User = users::table
             .filter(users::username.eq(uname))
@@ -68,7 +64,7 @@ impl UserRespository {
             return Err(UserRepositoryErrors::IncorrectPassword);
         }
 
-        Ok(Some(user))
+        Ok(user)
     }
 
     pub fn get_all_users(&mut self) -> Result<Vec<User>, UserRepositoryErrors> {

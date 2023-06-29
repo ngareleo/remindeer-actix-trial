@@ -10,7 +10,7 @@ use actix_web::{
 };
 use crate::{
     server::{
-        handlers::{ index_handler, users_handler, auth_handler },
+        handlers::{ api::users_handler, mobile::{ auth_handler, index_handler } },
         middleware::error_handling,
     },
     helpers::types::{ DbPool, AppUserRepository },
@@ -52,8 +52,8 @@ pub async fn run(app_config: AppConfig) -> Result<(), Error> {
                 .wrap(logger)
                 .service(index_handler::index)
                 .service(users_handler::get_users)
-                .service(auth_handler::sign_up)
-                .service(auth_handler::sign_in)
+                .service(users_handler::new_user)
+                .service(auth_handler::login)
                 .default_service(
                     web::route().guard(guard::Not(guard::Get())).to(error_handling::handle404)
                 )
