@@ -13,5 +13,7 @@ diesel::table! {
         password -> Varchar,
         created_at -> Timestamp,
         last_modified -> Timestamp,
+        #[max_length = 255]
+        phone_number -> Varchar,
     }
 }

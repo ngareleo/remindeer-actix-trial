@@ -50,10 +50,24 @@ pub async fn run(app_config: AppConfig) -> Result<(), Error> {
                 .app_data(app_config.user_repository.clone())
                 .app_data(app_config.db_pool.clone())
                 .wrap(logger)
-                .service(index_handler::index)
-                .service(users_handler::get_users)
-                .service(users_handler::new_user)
-                .service(auth_handler::login)
+                .service(
+                    web
+                        ::scope("/app")
+                        .service(auth_handler::login)
+                        .service(index_handler::index)
+                        .service(
+                            web
+                                ::scope("/check")
+                                .service(auth_handler::check_user_details_exists)
+                                .service(auth_handler::check_phone_number_exists)
+                        )
+                )
+                .service(
+                    web
+                        ::scope("/api")
+                        .service(users_handler::get_users)
+                        .service(users_handler::new_user)
+                )
                 .default_service(
                     web::route().guard(guard::Not(guard::Get())).to(error_handling::handle404)
                 )

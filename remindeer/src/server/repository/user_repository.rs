@@ -76,4 +76,43 @@ impl UserRespository {
             .map_err(|_| UserRepositoryErrors::UsersFetchingError)?;
         Ok(results)
     }
+
+    pub fn email_exists(&mut self, email: &str) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::email.eq(email))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
+    }
+
+    pub fn username_exists(&mut self, username: &str) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::username.eq(username))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
+    }
+
+    pub fn phone_number_exists(
+        &mut self,
+        phone_number: &str
+    ) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::phone_number.eq(phone_number))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
+    }
 }

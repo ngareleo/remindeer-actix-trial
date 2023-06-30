@@ -15,6 +15,7 @@ pub enum UserRepositoryErrors {
     #[display(fmt = "{}", message)] ExternalError {
         message: String,
     },
+    #[display(fmt = "Diesel error")] DieselError,
 }
 
 impl UserRepositoryErrors {
