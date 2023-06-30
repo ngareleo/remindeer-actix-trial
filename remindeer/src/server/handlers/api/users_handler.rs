@@ -12,6 +12,7 @@ pub struct SignUpFormData {
     email: String,
     password: String,
     username: String,
+    phone_number: String,
 }
 
 #[put("/user")]
@@ -30,7 +31,15 @@ pub async fn new_user(
                             String::from("Error acquiring lock")
                         )
                     )?;
-                Ok(repository.create_user(&form.name, &form.email, &form.password, &form.username)?)
+                Ok(
+                    repository.create_user(
+                        &form.name,
+                        &form.email,
+                        &form.password,
+                        &form.username,
+                        &form.phone_number
+                    )?
+                )
             }
         ).await
         .map_err(|_|

@@ -3,7 +3,7 @@ use actix_web::{ Responder, post, web, get, HttpResponse };
 use serde::{ Deserialize, Serialize };
 use crate::{
     helpers::types::AppUserRepository,
-    server::{ repository::{ repository_errors::UserRepositoryErrors }, models::user_model::User },
+    server::{ repository::repository_errors::UserRepositoryErrors, models::user_model::User },
 };
 
 #[derive(Deserialize)]

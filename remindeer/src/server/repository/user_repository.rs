@@ -15,6 +15,7 @@ pub struct NewUser<'a> {
     pub email: &'a str,
     pub username: &'a str,
     pub password: &'a str,
+    pub phone_number: &'a str,
 }
 
 pub struct UserRespository {
@@ -41,10 +42,11 @@ impl UserRespository {
         name: &str,
         email: &str,
         password: &str,
-        username: &str
+        username: &str,
+        phone_number: &str
     ) -> Result<User, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
-        let new_user = NewUser { name, email, password, username };
+        let new_user = NewUser { name, email, password, username, phone_number };
         let user = insert_into(users::table)
             .values(&new_user)
             .get_result(&mut conn)
