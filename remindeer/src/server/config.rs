@@ -10,7 +10,7 @@ use actix_web::{
 };
 use crate::{
     server::{
-        handlers::{ index_handler, users_handler, auth_handler },
+        handlers::{ api::users_handler, mobile::{ auth_handler, index_handler } },
         middleware::error_handling,
     },
     helpers::types::{ DbPool, AppUserRepository },
@@ -50,10 +50,24 @@ pub async fn run(app_config: AppConfig) -> Result<(), Error> {
                 .app_data(app_config.user_repository.clone())
                 .app_data(app_config.db_pool.clone())
                 .wrap(logger)
-                .service(index_handler::index)
-                .service(users_handler::get_users)
-                .service(auth_handler::sign_up)
-                .service(auth_handler::sign_in)
+                .service(
+                    web
+                        ::scope("/app")
+                        .service(auth_handler::login)
+                        .service(index_handler::index)
+                        .service(
+                            web
+                                ::scope("/check")
+                                .service(auth_handler::check_user_details_exists)
+                                .service(auth_handler::check_phone_number_exists)
+                        )
+                )
+                .service(
+                    web
+                        ::scope("/api")
+                        .service(users_handler::get_users)
+                        .service(users_handler::new_user)
+                )
                 .default_service(
                     web::route().guard(guard::Not(guard::Get())).to(error_handling::handle404)
                 )

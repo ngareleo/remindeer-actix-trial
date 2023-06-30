@@ -15,6 +15,7 @@ pub enum UserRepositoryErrors {
     #[display(fmt = "{}", message)] ExternalError {
         message: String,
     },
+    #[display(fmt = "Diesel error")] DieselError,
 }
 
 impl UserRepositoryErrors {
@@ -25,7 +26,8 @@ impl UserRepositoryErrors {
 
 impl error::ResponseError for UserRepositoryErrors {
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).body(self.to_string())
+        dbg!("[error] {}", self.to_string());
+        HttpResponse::build(self.status_code()).body("Error occurred")
     }
 
     fn status_code(&self) -> StatusCode {

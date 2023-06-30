@@ -12,4 +12,5 @@ pub struct User {
     pub password: String,
     pub created_at: chrono::NaiveDateTime,
     pub last_modified: chrono::NaiveDateTime,
+    pub phone_number: String,
 }

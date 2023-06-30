@@ -15,6 +15,7 @@ pub struct NewUser<'a> {
     pub email: &'a str,
     pub username: &'a str,
     pub password: &'a str,
+    pub phone_number: &'a str,
 }
 
 pub struct UserRespository {
@@ -41,10 +42,11 @@ impl UserRespository {
         name: &str,
         email: &str,
         password: &str,
-        username: &str
+        username: &str,
+        phone_number: &str
     ) -> Result<User, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
-        let new_user = NewUser { name, email, password, username };
+        let new_user = NewUser { name, email, password, username, phone_number };
         let user = insert_into(users::table)
             .values(&new_user)
             .get_result(&mut conn)
@@ -52,11 +54,7 @@ impl UserRespository {
         Ok(user)
     }
 
-    pub fn user_exists(
-        &mut self,
-        uname: &str,
-        pass: &str
-    ) -> Result<Option<User>, UserRepositoryErrors> {
+    pub fn user_exists(&mut self, uname: &str, pass: &str) -> Result<User, UserRepositoryErrors> {
         let mut conn = self.get_connection()?;
         let user: User = users::table
             .filter(users::username.eq(uname))
@@ -68,7 +66,7 @@ impl UserRespository {
             return Err(UserRepositoryErrors::IncorrectPassword);
         }
 
-        Ok(Some(user))
+        Ok(user)
     }
 
     pub fn get_all_users(&mut self) -> Result<Vec<User>, UserRepositoryErrors> {
@@ -79,5 +77,44 @@ impl UserRespository {
             .load(&mut conn)
             .map_err(|_| UserRepositoryErrors::UsersFetchingError)?;
         Ok(results)
+    }
+
+    pub fn email_exists(&mut self, email: &str) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::email.eq(email))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
+    }
+
+    pub fn username_exists(&mut self, username: &str) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::username.eq(username))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
+    }
+
+    pub fn phone_number_exists(
+        &mut self,
+        phone_number: &str
+    ) -> Result<bool, UserRepositoryErrors> {
+        let mut conn = self.get_connection()?;
+        let count = users::table
+            .filter(users::phone_number.eq(phone_number))
+            .count()
+            .get_result(&mut conn)
+            .optional()
+            .map_err(|_| UserRepositoryErrors::DieselError)?;
+        let is_exist = count.unwrap_or(0) >= 1;
+        Ok(is_exist)
     }
 }
