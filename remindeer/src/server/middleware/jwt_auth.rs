@@ -29,7 +29,7 @@ impl FromRequest for JwtMiddleware {
 
     fn from_request(
         req: &actix_web::HttpRequest,
-        payload: &mut actix_web::dev::Payload
+        _payload: &mut actix_web::dev::Payload
     ) -> Self::Future {
         let data = req.app_data::<web::Data<AppState>>().unwrap();
 
