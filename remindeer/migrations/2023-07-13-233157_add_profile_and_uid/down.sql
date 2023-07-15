@@ -1,2 +1,0 @@
-ALTER TABLE users DROP unid CASCADE ;
-ALTER TABLE users DROP photo CASCADE ;
