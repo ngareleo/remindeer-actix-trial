@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 actix-web = "4.3.1"
 chrono = { version = "0.4.10", features = ["serde"] }
-diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono"] }
+diesel = { version = "2.1.0", features = ["postgres", "r2d2", "chrono", "uuid"] }
 dotenvy = "0.15"
 env_logger = "0.10.0"
 log = "0.4.19"
@@ -17,3 +17,8 @@ tokio = "1.28.2"
 r2d2 = "0.8.10"
 derive_more = "0.99.17"
 serde_json = "1.0.99"
+actix-cors = "0.6.4"
+uuid = { version = "1.4.0", features = ["serde"] }
+jsonwebtoken = "8.3.0"
+argon2 = "0.5.1"
+rand_core =  { version = "0.6.4", features = ["std"] }

@@ -17,6 +17,18 @@ use crate::{
 };
 
 #[derive(Clone)]
+pub struct Env {
+    pub jwt_secret: String,
+}
+
+#[derive(Clone)]
+pub struct AppState {
+    pub pool: DbPool,
+    pub user_repository: AppUserRepository,
+    pub env: Env,
+}
+
+#[derive(Clone)]
 pub struct AppConfig {
     pub port: u16,
     pub db_pool: Data<DbPool>,
