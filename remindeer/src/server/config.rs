@@ -17,6 +17,12 @@ use crate::{
 };
 
 #[derive(Clone)]
+pub struct AppState {
+    pub pool: DbPool,
+    pub user_repository: AppUserRepository,
+}
+
+#[derive(Clone)]
 pub struct AppConfig {
     pub port: u16,
     pub db_pool: Data<DbPool>,

@@ -15,5 +15,8 @@ diesel::table! {
         last_modified -> Timestamp,
         #[max_length = 255]
         phone_number -> Varchar,
+        unid -> Uuid,
+        #[max_length = 100]
+        photo -> Varchar,
     }
 }

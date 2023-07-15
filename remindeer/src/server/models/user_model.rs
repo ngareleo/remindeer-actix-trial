@@ -1,5 +1,6 @@
 use serde::{ Serialize, Deserialize };
 use diesel::prelude::*;
+use uuid;
 
 #[derive(Serialize, Deserialize, Debug, Queryable, Selectable)]
 #[diesel(table_name = crate::schema::users)]
@@ -13,4 +14,6 @@ pub struct User {
     pub created_at: chrono::NaiveDateTime,
     pub last_modified: chrono::NaiveDateTime,
     pub phone_number: String,
+    pub unid: uuid::Uuid,
+    pub photo: String,
 }
